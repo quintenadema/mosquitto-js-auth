@@ -8,67 +8,22 @@ Mosquitto JS auth is a lightweight and straightforward plugin for the Mosquitto 
 - Minimal and lightweight
 - ACL check support
 
-## Getting Started
+## Installation
 
-### Prerequisites
+1. **Clone builds folder**
+	In the **builds** folder, you will find all builds for every system. 
 
-- **Mosquitto**
-- **GCC**
-- **Javascript**
-
-### Installation
-
-1. **Clone the repository**
-
-    ```bash
-    git clone https://github.com/quintenadema/mosquitt-js-auth.git
-    cd mosquitt-js-auth
-    ```
-
-
-2. **Compile the plugin**
-   
-   Compile the plugin using the following command:
-   ```bash
-   gcc -fPIC -shared -o mosquitto-js-auth.so mosquitto-js-auth.c -I/usr/include/mosquitto
-   ```
-   - **`-fPIC`**: Generates position-independent code, which is required for shared libraries.
-   - **`-shared`**: Creates a shared object (`.so`) file.
-   - **`-I/usr/include/mosquitto`**: Points to the directory where Mosquitto header files are located.
-
-
-   Or, if that doesn't work, use:
-   ```bash
-   gcc -fPIC -shared -o mosquitto-js-auth.so mosquitto-js-auth.c -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto
-   ```
-   - **`-I/opt/homebrew/include`**: Specifies the include directory for Mosquitto headers.
-   - **`-L/opt/homebrew/lib`**: Specifies the library directory where Mosquitto’s libraries are located.
-   - **`-lmosquitto`**: Links against the Mosquitto library to resolve necessary symbols.
-
-
-
-
-	If you are using an ARM-based Mac (e.g., M1 or M2 chip):
-	```bash
-	gcc -arch arm64 -fPIC -shared -o mosquitto-js-auth.so mosquitto-js-auth.c -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto -Wl,-undefined,dynamic_lookup
-	```
-	- **`-arch arm64`**: Compiles the plugin for ARM64 architecture, suitable for Apple Silicon.
-	- **`-Wl,-undefined,dynamic_lookup`**: Instructs the linker to resolve symbols dynamically, which is useful when the symbols are resolved at runtime.
-
-3. **Setup Mosquitto**
-
-    Add the following to your `mosquitto.conf`:
-
+2. **Configure plugin**
+    Add the following to your `mosquitto.conf`, and make sure to replace `/path/to/` to a place where the plugin is located, and `arm64.so` with the right build for your system:
     ```ini
-    auth_plugin /path/to/mosquitt-js-auth.so
+    auth_plugin /path/to/arm64.so
     ```
 
 4. **Write your authentication script**
-
-    Create a file in your Mosquitto folder at `mosquitto-js-auth/validate.js`:
+    In the same folder as the plugin, create a `auth.js`, and configure your auth script in here.
 
     ```javascript
-    // mosquitto-js-auth/validate.js
+    // auth.js
 
     const username = process.argv[2];
     const password = process.argv[3];
@@ -80,8 +35,36 @@ Mosquitto JS auth is a lightweight and straightforward plugin for the Mosquitto 
     }
     ```
 
-5. **Run Mosquitto**
 
-    ```bash
-    mosquitto -c /path/to/mosquitto.conf
-    ```
+
+### Building the plugin
+
+	Compile the plugin using the following command:
+	```bash
+	gcc -fPIC -shared -o mosquitto-js-auth.so mosquitto-js-auth.c -I/usr/include/mosquitto
+	```
+	- **`-fPIC`**: Generates position-independent code, which is required for shared libraries.
+	- **`-shared`**: Creates a shared object (`.so`) file.
+	- **`-I/usr/include/mosquitto`**: Points to the directory where Mosquitto header files are located.
+
+	Or, if that doesn't work, use:
+	```bash
+	gcc -fPIC -shared -o mosquitto-js-auth.so mosquitto-js-auth.c -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto
+	```
+	- **`-fPIC`**: Generates position-independent code, which is required for shared libraries.
+	- **`-shared`**: Creates a shared object (`.so`) file.
+	- **`-I/opt/homebrew/include`**: Specifies the include directory for Mosquitto headers.
+	- **`-L/opt/homebrew/lib`**: Specifies the library directory where Mosquitto’s libraries are located.
+	- **`-lmosquitto`**: Links against the Mosquitto library to resolve necessary symbols.
+
+	If you are using an ARM-based Mac (e.g., M1 or M2 chip):
+	```bash
+	gcc -arch arm64 -fPIC -shared -o builds/arm64.so mosquitto-js-auth.c -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto -Wl,-undefined,dynamic_lookup
+	```
+	- **`-arch arm64`**: Compiles the plugin for ARM64 architecture, suitable for Apple Silicon.
+	- **`-fPIC`**: Generates position-independent code, which is required for shared libraries.
+	- **`-shared`**: Creates a shared object (`.so`) file.
+	- **`-I/opt/homebrew/include`**: Specifies the include directory for Mosquitto headers.
+	- **`-L/opt/homebrew/lib`**: Specifies the library directory where Mosquitto’s libraries are located.
+	- **`-lmosquitto`**: Links against the Mosquitto library to resolve necessary symbols.
+	- **`-Wl,-undefined,dynamic_lookup`**: Instructs the linker to resolve symbols dynamically, which is useful when the symbols are resolved at runtime.

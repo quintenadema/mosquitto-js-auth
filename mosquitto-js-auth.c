@@ -13,7 +13,7 @@ static int auth_callback(int event, void *event_data, void *user_data) {
 
     const char *username = auth_data->username;
     const char *password = auth_data->password;
-    const char *script_path = "mosquitto-js-auth/validate.js";
+    const char *script_path = "auth.js";
 
     // Check if validate.js exists
     exist = stat(script_path, &buffer);
