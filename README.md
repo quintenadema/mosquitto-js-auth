@@ -28,7 +28,7 @@ Mosquitto JS auth is a lightweight and straightforward plugin for the Mosquitto 
 2. **Compile the Plugin**
 
     ```bash
-    gcc -fPIC -shared -o mosquitt-js-auth.so mosquitt-js-auth.c -I/usr/include/mosquitto
+    gcc -fPIC -shared -o mosquitt-js-auth.so mosquitto-js-auth.c -I/usr/include/mosquitto
     ```
 
 3. **Setup Mosquitto**
