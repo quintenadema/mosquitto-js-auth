@@ -4,31 +4,36 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
         arch: [x86-64, arm64]
 
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Docker environment for arm64
+        if: matrix.arch == 'arm64'
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace arm64v8/ubuntu:20.04 /bin/bash -c "
+          apt-get update && apt-get install -y build-essential libmosquitto-dev mosquitto-dev && \
+          gcc -fPIC -shared -o builds/arm64.so mosquitto-js-auth.c -I/usr/include -L/usr/lib -lmosquitto
+          "
+
       - name: Set up build environment on Ubuntu
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x86-64'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential wget gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-          sudo apt-get install -y libssl-dev:arm64
+          sudo apt-get install -y build-essential libmosquitto-dev mosquitto-dev
 
-      - name: Download and compile Mosquitto for arm64
-        if: matrix.os == 'ubuntu-latest' && matrix.arch == 'arm64'
+      - name: Compile for x86-64 on Ubuntu
+        if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x86-64'
         run: |
-          wget https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz
-          tar -xzf mosquitto-2.0.15.tar.gz
-          cd mosquitto-2.0.15
-          make CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ prefix=/usr/aarch64-linux-gnu
-          sudo make install CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ prefix=/usr/aarch64-linux-gnu
+          gcc -fPIC -shared -o builds/x86-64.so mosquitto-js-auth.c \
+          -I/usr/include -L/usr/lib -lmosquitto
 
       - name: Set up Homebrew on macOS
         if: matrix.os == 'macos-latest'
@@ -39,35 +44,19 @@ jobs:
         run: |
           brew install mosquitto
 
-      - name: Create builds directory
-        run: mkdir -p builds
-
       - name: Compile for ${{ matrix.arch }} on macOS
         if: matrix.os == 'macos-latest'
         run: |
           HOMEBREW_PREFIX=$(brew --prefix)
 
           if [[ ${{ matrix.arch }} == 'arm64' ]]; then
-            clang -arch arm64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
+            clang -arch arm64 -fPIC -shared -o builds/arm64.so mosquitto-js-auth.c \
             -I$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto \
             -Wl,-undefined,dynamic_lookup
 
           elif [[ ${{ matrix.arch }} == 'x86-64' ]]; then
-            clang -arch x86_64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
+            clang -arch x86_64 -fPIC -shared -o builds/x86-64.so mosquitto-js-auth.c \
             -I$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto
-
-          fi
-
-      - name: Compile for ${{ matrix.arch }} on Ubuntu
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          if [[ ${{ matrix.arch }} == 'arm64' ]]; then
-            aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/usr/aarch64-linux-gnu/include -L/usr/aarch64-linux-gnu/lib -lmosquitto
-
-          elif [[ ${{ matrix.arch }} == 'x86-64' ]]; then
-            gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/usr/include -L/usr/lib -lmosquitto
 
           fi
 
