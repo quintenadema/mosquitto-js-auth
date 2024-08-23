@@ -50,6 +50,8 @@ jobs:
 
       - name: Compile for ${{ matrix.arch }} on ${{ matrix.os }}
         run: |
+          HOMEBREW_PREFIX=$(brew --prefix)
+          
           if [[ ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
             aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I/usr/include -L/usr/lib -lmosquitto
@@ -60,11 +62,11 @@ jobs:
 
           elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
             clang -arch arm64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto
+            -I/$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto
 
           elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'x86-64' ]]; then
             clang -arch x86_64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto
+            -I$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto
 
           fi
 
