@@ -18,6 +18,8 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo dpkg --add-architecture arm64
+          sudo sed -i 's|http://security.ubuntu.com/ubuntu|http://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list
+          sudo sed -i 's|http://archive.ubuntu.com/ubuntu|http://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list
           sudo apt-get update
           sudo apt-get install -y build-essential libmosquitto-dev mosquitto-dev
           if [[ ${{ matrix.arch }} == 'arm64' ]]; then
