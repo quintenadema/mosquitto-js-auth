@@ -35,6 +35,7 @@ jobs:
       - name: Set up build environment on macOS
         if: matrix.os == 'macos-latest'
         run: |
+          export PATH="/opt/homebrew/bin:$PATH"
           brew update
           brew install mosquitto
 
@@ -47,6 +48,7 @@ jobs:
             gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I/usr/include -L/usr/lib -lmosquitto
           else
+            export PATH="/opt/homebrew/bin:$PATH"
             gcc -arch ${{ matrix.arch }} -fPIC -shared -o builds/${{ matrix.arch }}.so \
             mosquitto-js-auth.c -I/opt/homebrew/Cellar/mosquitto/2.0.18/include \
             -L/opt/homebrew/Cellar/mosquitto/2.0.18/lib -lmosquitto
