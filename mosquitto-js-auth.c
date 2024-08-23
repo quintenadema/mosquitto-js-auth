@@ -2,14 +2,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include "mosquitto_broker.h"
-#include "mosquitto_plugin.h"
-#include "mosquitto.h"
+#include <mosquitto.h>
+#include <mosquitto_broker.h>
+#include <mosquitto_plugin.h>
 
-static mosquitto_plugin_id_t *mosq_pid = NULL;
+// Static variable to keep track of plugin context (if needed)
+static void *mosq_pid = NULL;
 
 static int auth_callback(int event, void *event_data, void *user_data) {
-    struct mosquitto_evt_basic_auth *auth_data = event_data;
+    struct mosquitto_evt_basic_auth *auth_data = (struct mosquitto_evt_basic_auth *)event_data;
     struct stat buffer;
     int exist;
 
@@ -53,29 +54,14 @@ static int auth_callback(int event, void *event_data, void *user_data) {
 }
 
 int mosquitto_plugin_version(int supported_version_count, const int *supported_versions) {
-    int i;
-
-    for (i = 0; i < supported_version_count; i++) {
-        if (supported_versions[i] == 5) {
-            return 5;
-        }
-    }
-    return -1;
+    return MOSQ_PLUGIN_VERSION;
 }
 
-int mosquitto_plugin_init(mosquitto_plugin_id_t *identifier, void **user_data, struct mosquitto_opt *opts, int opt_count) {
-    UNUSED(user_data);
-    UNUSED(opts);
-    UNUSED(opt_count);
-
-    mosq_pid = identifier;
-    return mosquitto_callback_register(mosq_pid, MOSQ_EVT_BASIC_AUTH, auth_callback, NULL, NULL);
+int mosquitto_plugin_init(void **user_data, struct mosquitto_opt *opts, int opt_count) {
+    mosq_pid = *user_data;  // Store the plugin context (if needed)
+    return mosquitto_callback_register(mosq_pid, MOSQ_EVT_BASIC_AUTH, auth_callback, NULL);
 }
 
 int mosquitto_plugin_cleanup(void *user_data, struct mosquitto_opt *opts, int opt_count) {
-    UNUSED(user_data);
-    UNUSED(opts);
-    UNUSED(opt_count);
-
     return mosquitto_callback_unregister(mosq_pid, MOSQ_EVT_BASIC_AUTH, auth_callback, NULL);
 }
