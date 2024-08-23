@@ -23,18 +23,14 @@ jobs:
             sudo apt-get install -y gcc-aarch64-linux-gnu
           fi
 
-      - name: Download Mosquitto on macOS
+      - name: Set up Homebrew on macOS
         if: matrix.os == 'macos-latest'
-        run: |
-          curl -LO https://mosquitto.org/files/source/mosquitto-2.0.18.tar.gz
-          tar -xzvf mosquitto-2.0.18.tar.gz
+        uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Set up build environment on macOS
+      - name: Install Mosquitto on macOS
         if: matrix.os == 'macos-latest'
         run: |
-          cd mosquitto-2.0.18
-          make
-          sudo make install
+          brew install mosquitto
 
       - name: Compile for ${{ matrix.arch }} on ${{ matrix.os }}
         run: |
