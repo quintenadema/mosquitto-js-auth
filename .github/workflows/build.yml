@@ -23,8 +23,17 @@ jobs:
             sudo apt-get install -y gcc-aarch64-linux-gnu
           fi
 
+          dpkg -L mosquitto-dev | grep "mosquitto.h" || echo "mosquitto.h not found in mosquitto-dev package"
+
           echo "Searching for mosquitto.h in /usr/include and /usr/local/include"
           find /usr/include /usr/local/include -name "mosquitto.h" -print
+
+      - name: Search entire filesystem for mosquitto.h
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get install -y mlocate
+          sudo updatedb
+          locate mosquitto.h || echo "mosquitto.h not found on the filesystem"
 
       - name: Set up Homebrew on macOS
         if: matrix.os == 'macos-latest'
