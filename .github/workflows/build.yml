@@ -23,21 +23,18 @@ jobs:
             sudo apt-get install -y gcc-aarch64-linux-gnu
           fi
 
-      - name: Install Homebrew on macOS
+      - name: Download Mosquitto on macOS
         if: matrix.os == 'macos-latest'
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
-          echo 'export PATH="/opt/homebrew/bin:$PATH"' >> $HOME/.zprofile
-          eval "$(/opt/homebrew/bin/brew shellenv)"
-          export PATH="/opt/homebrew/bin:$PATH"
+          curl -LO https://mosquitto.org/files/source/mosquitto-2.0.18.tar.gz
+          tar -xzvf mosquitto-2.0.18.tar.gz
 
       - name: Set up build environment on macOS
         if: matrix.os == 'macos-latest'
         run: |
-          export PATH="/opt/homebrew/bin:$PATH"
-          brew update
-          brew install mosquitto
+          cd mosquitto-2.0.18
+          make
+          sudo make install
 
       - name: Compile for ${{ matrix.arch }} on ${{ matrix.os }}
         run: |
@@ -48,10 +45,8 @@ jobs:
             gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I/usr/include -L/usr/lib -lmosquitto
           else
-            export PATH="/opt/homebrew/bin:$PATH"
             gcc -arch ${{ matrix.arch }} -fPIC -shared -o builds/${{ matrix.arch }}.so \
-            mosquitto-js-auth.c -I/opt/homebrew/Cellar/mosquitto/2.0.18/include \
-            -L/opt/homebrew/Cellar/mosquitto/2.0.18/lib -lmosquitto
+            mosquitto-js-auth.c -I/usr/local/include -L/usr/local/lib -lmosquitto
           fi
 
       - name: Upload Build Artifacts
