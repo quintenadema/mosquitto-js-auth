@@ -45,12 +45,12 @@ jobs:
             -I/usr/include -L/usr/lib -lmosquitto
 
           elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
-            clang -arch arm64 -fPIC -shared -o builds/${{ matrix.arch }}.so \
-            mosquitto-js-auth.c -I/usr/local/include -L/usr/local/lib -lmosquitto
+            clang -arch arm64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
+            -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto
 
           elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'x86-64' ]]; then
-            clang -fPIC -shared -o builds/${{ matrix.arch }}.so \
-            mosquitto-js-auth.c -I/usr/local/include -L/usr/local/lib -lmosquitto
+            clang -arch x86_64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
+            -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto
 
           fi
 
