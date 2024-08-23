@@ -27,8 +27,10 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
+          echo 'export PATH="/opt/homebrew/bin:$PATH"' >> $HOME/.zprofile
           eval "$(/opt/homebrew/bin/brew shellenv)"
+          export PATH="/opt/homebrew/bin:$PATH"
 
       - name: Set up build environment on macOS
         if: matrix.os == 'macos-latest'
