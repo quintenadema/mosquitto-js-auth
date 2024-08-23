@@ -18,10 +18,16 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libmosquitto-dev mosquitto-dev
-          if [[ ${{ matrix.arch }} == 'arm64' ]]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libmosquitto-dev:arm64
-          fi
+          sudo apt-get install -y build-essential wget gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Download and compile Mosquitto for arm64
+        if: matrix.os == 'ubuntu-latest' && matrix.arch == 'arm64'
+        run: |
+          wget https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz
+          tar -xzf mosquitto-2.0.15.tar.gz
+          cd mosquitto-2.0.15
+          make CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ prefix=/usr/aarch64-linux-gnu
+          sudo make install CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ prefix=/usr/aarch64-linux-gnu
 
       - name: Set up Homebrew on macOS
         if: matrix.os == 'macos-latest'
