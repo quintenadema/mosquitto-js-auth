@@ -7,8 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        arch: [x86-64, arm64]
+        # os: [ubuntu-latest, macos-latest]
+        # arch: [x86-64, arm64]
+        os: [macos-latest]
+        arch: [arm64]
 
     steps:
       - name: Checkout code
@@ -34,10 +36,10 @@ jobs:
 
       - name: Compile for ${{ matrix.arch }} on ${{ matrix.os }}
         run: |
-          if [[ '${{ matrix.os }}' == 'ubuntu-latest' && '${{ matrix.arch }}' == 'arm64' ]]; then
+          if [[ ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
             aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I/usr/include -L/usr/lib -lmosquitto
-          elif [[ '${{ matrix.os }}' == 'ubuntu-latest' ]]; then
+          elif [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then
             gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I/usr/include -L/usr/lib -lmosquitto
           else
