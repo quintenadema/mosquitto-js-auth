@@ -1,0 +1,41 @@
+name: Build Mosquitto Plugin
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        arch: [x86_64, arm64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up build environment
+        run: |
+          sudo apt-get update || brew update
+          if [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then
+            sudo apt-get install -y build-essential mosquitto-dev
+          else
+            brew install mosquitto
+          fi
+
+      - name: Compile for ${{ matrix.arch }} on ${{ matrix.os }}
+        run: |
+          if [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then
+            gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
+            -I/usr/include -L/usr/lib -lmosquitto -march=${{ matrix.arch }}
+          else
+            gcc -arch ${{ matrix.arch }} -fPIC -shared -o builds/${{ matrix.arch }}.so \
+            mosquitto-js-auth.c -I/opt/homebrew/Cellar/mosquitto/2.0.18/include \
+            -L/opt/homebrew/Cellar/mosquitto/2.0.18/lib -lmosquitto
+          fi
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: mosquitto-plugin-${{ matrix.os }}-${{ matrix.arch }}
+          path: builds/
