@@ -1,0 +1,29 @@
+name: Build Mosquitto Plugin (arm64, macOS)
+
+on: [push, pull_request]
+
+jobs:
+  build-arm64-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Homebrew on macOS
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install Mosquitto on macOS
+        run: |
+          brew install mosquitto
+
+      - name: Compile for arm64 on macOS
+        run: |
+          clang -arch arm64 -fPIC -shared -o builds/arm64.so mosquitto-js-auth.c \
+          -I$(brew --prefix)/include -L$(brew --prefix)/lib -lmosquitto
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: mosquitto-plugin-arm64-macos
+          path: builds/

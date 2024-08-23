@@ -1,0 +1,27 @@
+name: Build Mosquitto Plugin (x86-64, Ubuntu)
+
+on: [push, pull_request]
+
+jobs:
+  build-x86-64-ubuntu:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up build environment on Ubuntu
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libmosquitto-dev mosquitto-dev
+
+      - name: Compile for x86-64 on Ubuntu
+        run: |
+          gcc -fPIC -shared -o builds/x86-64.so mosquitto-js-auth.c \
+          -I/usr/include -L/usr/lib -lmosquitto
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: mosquitto-plugin-x86-64-ubuntu
+          path: builds/
