@@ -17,13 +17,10 @@ jobs:
       - name: Set up build environment on Ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo dpkg --add-architecture arm64
-          sudo sed -i 's|http://archive.ubuntu.com/ubuntu|http://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list
-          sudo sed -i 's|http://security.ubuntu.com/ubuntu|http://ports.ubuntu.com/ubuntu-ports|g' /etc/apt/sources.list
           sudo apt-get update
           sudo apt-get install -y build-essential libmosquitto-dev mosquitto-dev
           if [[ ${{ matrix.arch }} == 'arm64' ]]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu libmosquitto-dev:arm64
+            sudo apt-get install -y gcc-aarch64-linux-gnu
           fi
 
       - name: Set up Homebrew on macOS
@@ -59,8 +56,7 @@ jobs:
         run: |
           if [[ ${{ matrix.arch }} == 'arm64' ]]; then
             aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/usr/include -I/usr/aarch64-linux-gnu/include \
-            -L/usr/lib -L/usr/aarch64-linux-gnu/lib -lmosquitto
+            -I/usr/include -L/usr/lib -lmosquitto
 
           elif [[ ${{ matrix.arch }} == 'x86-64' ]]; then
             gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
