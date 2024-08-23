@@ -34,6 +34,12 @@ jobs:
         run: |
           brew install mosquitto
 
+      - name: Log /opt/homebrew/include contents
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "Logging contents of /opt/homebrew/include"
+          ls -la /opt/homebrew/include
+
       - name: Compile for ${{ matrix.arch }} on ${{ matrix.os }}
         run: |
           if [[ ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
