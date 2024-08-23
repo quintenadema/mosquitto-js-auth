@@ -18,22 +18,15 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential mosquitto-dev
+          sudo apt-get install -y build-essential libmosquitto-dev
           if [[ ${{ matrix.arch }} == 'arm64' ]]; then
             sudo apt-get install -y gcc-aarch64-linux-gnu
           fi
 
-          dpkg -L mosquitto-dev | grep "mosquitto.h" || echo "mosquitto.h not found in mosquitto-dev package"
+          dpkg -L libmosquitto-dev | grep "mosquitto.h" || echo "mosquitto.h not found in libmosquitto-dev package"
 
           echo "Searching for mosquitto.h in /usr/include and /usr/local/include"
           find /usr/include /usr/local/include -name "mosquitto.h" -print
-
-      - name: Search entire filesystem for mosquitto.h
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get install -y mlocate
-          sudo updatedb
-          locate mosquitto.h || echo "mosquitto.h not found on the filesystem"
 
       - name: Set up Homebrew on macOS
         if: matrix.os == 'macos-latest'
