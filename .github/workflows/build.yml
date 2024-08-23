@@ -7,27 +7,36 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        arch: [x86-64, arm64]
+        os: [ubuntu-latest, macos-latest]
+        arch: [x86_64, arm64]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up build environment
+      - name: Set up build environment on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt-get update || brew update
-          if [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then
-            sudo apt-get install -y build-essential mosquitto-dev
-          else
-            brew install mosquitto
+          sudo apt-get update
+          sudo apt-get install -y build-essential mosquitto-dev
+          if [[ ${{ matrix.arch }} == 'arm64' ]]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu
           fi
+
+      - name: Set up build environment on macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install mosquitto
 
       - name: Compile for ${{ matrix.arch }} on ${{ matrix.os }}
         run: |
-          if [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then
+          if [[ ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
+            aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
+            -I/usr/include -L/usr/lib -lmosquitto
+          elif [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then
             gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/usr/include -L/usr/lib -lmosquitto -march=${{ matrix.arch }}
+            -I/usr/include -L/usr/lib -lmosquitto
           else
             gcc -arch ${{ matrix.arch }} -fPIC -shared -o builds/${{ matrix.arch }}.so \
             mosquitto-js-auth.c -I/opt/homebrew/Cellar/mosquitto/2.0.18/include \
