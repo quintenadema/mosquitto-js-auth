@@ -7,25 +7,25 @@
 #include <mosquitto_plugin.h>
 
 static int auth_callback(int event, void *event_data, void *user_data) {
-    struct mosquitto_evt_basic_auth *auth_data = event_data;
+    struct mosquitto_evt_basic_auth *auth_data = (struct mosquitto_evt_basic_auth *)event_data;
     struct stat buffer;
     int exist;
 
-    const char *username = auth_data->username;
+    const char *username = mosquitto_client_username(auth_data->client);
     const char *password = auth_data->password;
     const char *script_path = "auth.js";
 
-    // Check if validate.js exists
+    // Check if auth.js exists
     exist = stat(script_path, &buffer);
-    if(exist != 0) {
+    if (exist != 0) {
         mosquitto_log_printf(MOSQ_LOG_ERR, "Auth script %s not found.", script_path);
         return MOSQ_ERR_AUTH; // Deny connection if script doesn't exist
     }
 
-    if(username && password) {
+    if (username && password) {
         char command[256];
         snprintf(command, sizeof(command), "node %s %s %s", script_path, username, password);
-        
+
         FILE *fp = popen(command, "r");
         if (fp == NULL) {
             mosquitto_log_printf(MOSQ_LOG_ERR, "Failed to run command.");
@@ -51,7 +51,7 @@ static int auth_callback(int event, void *event_data, void *user_data) {
 }
 
 int mosquitto_plugin_version(int supported_version_count, const int *supported_versions) {
-    return MOSQ_PLUGIN_VERSION;
+    return MOSQ_AUTH_PLUGIN_VERSION;
 }
 
 int mosquitto_plugin_init(mosquitto_plugin_id_t *plugin_id, void **user_data, struct mosquitto_opt *options, int option_count) {
