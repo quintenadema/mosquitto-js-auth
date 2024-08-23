@@ -20,7 +20,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libmosquitto-dev mosquitto-dev
           if [[ ${{ matrix.arch }} == 'arm64' ]]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+            sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libmosquitto-dev:arm64
           fi
 
       - name: Set up Homebrew on macOS
@@ -56,7 +56,7 @@ jobs:
         run: |
           if [[ ${{ matrix.arch }} == 'arm64' ]]; then
             aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/usr/include -L/usr/lib -lmosquitto
+            -I/usr/aarch64-linux-gnu/include -L/usr/aarch64-linux-gnu/lib -lmosquitto
 
           elif [[ ${{ matrix.arch }} == 'x86-64' ]]; then
             gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
