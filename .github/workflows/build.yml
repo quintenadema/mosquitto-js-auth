@@ -7,10 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # os: [ubuntu-latest, macos-latest]
-        # arch: [x86-64, arm64]
-        os: [macos-latest]
-        arch: [arm64]
+        os: [ubuntu-latest, macos-latest]
+        arch: [x86-64, arm64]
 
     steps:
       - name: Checkout code
@@ -51,7 +49,8 @@ jobs:
 
           elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
             clang -arch arm64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto
+            -I$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto \
+            -Wl,-undefined,dynamic_lookup
 
           elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'x86-64' ]]; then
             clang -arch x86_64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
