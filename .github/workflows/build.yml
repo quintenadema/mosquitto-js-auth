@@ -15,6 +15,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Create builds directory
+        run: mkdir -p builds
+
+
+
+
       - name: Set up QEMU for ARM emulation
         if: matrix.arch == 'arm64'
         run: |
@@ -30,6 +36,14 @@ jobs:
           gcc -fPIC -shared -o builds/arm64.so mosquitto-js-auth.c -I/usr/include -L/usr/lib -lmosquitto
           "
 
+
+
+
+
+
+
+
+
       - name: Set up build environment on Ubuntu
         if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x86-64'
         run: |
@@ -41,6 +55,14 @@ jobs:
         run: |
           gcc -fPIC -shared -o builds/x86-64.so mosquitto-js-auth.c \
           -I/usr/include -L/usr/lib -lmosquitto
+
+
+
+
+
+
+
+
 
       - name: Set up Homebrew on macOS
         if: matrix.os == 'macos-latest'
@@ -66,6 +88,12 @@ jobs:
             -I$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto
 
           fi
+
+
+
+
+
+
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
