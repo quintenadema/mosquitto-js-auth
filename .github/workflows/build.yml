@@ -39,15 +39,19 @@ jobs:
           if [[ ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
             aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I/usr/include -L/usr/lib -lmosquitto
-          elif [[ ${{ matrix.os }} == 'ubuntu-latest' ]]; then
+
+          elif [[ ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.arch }} == 'x86-64' ]]; then
             gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I/usr/include -L/usr/lib -lmosquitto
+
           elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
             gcc -target arm64-apple-macos11 -fPIC -shared -o builds/${{ matrix.arch }}.so \
             mosquitto-js-auth.c -I/usr/local/include -L/usr/local/lib -lmosquitto
-          else
+
+          elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'x86-64' ]]; then
             gcc -target x86_64-apple-macos10.12 -fPIC -shared -o builds/${{ matrix.arch }}.so \
             mosquitto-js-auth.c -I/usr/local/include -L/usr/local/lib -lmosquitto
+
           fi
 
       - name: Upload Build Artifacts
