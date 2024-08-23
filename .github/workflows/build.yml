@@ -35,26 +35,32 @@ jobs:
       - name: Create builds directory
         run: mkdir -p builds
 
-      - name: Compile for ${{ matrix.arch }} on ${{ matrix.os }}
+      - name: Compile for ${{ matrix.arch }} on macOS
+        if: matrix.os == 'macos-latest'
         run: |
           HOMEBREW_PREFIX=$(brew --prefix)
-          
-          if [[ ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
-            aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/usr/include -L/usr/lib -lmosquitto
 
-          elif [[ ${{ matrix.os }} == 'ubuntu-latest' && ${{ matrix.arch }} == 'x86-64' ]]; then
-            gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
-            -I/usr/include -L/usr/lib -lmosquitto
-
-          elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'arm64' ]]; then
+          if [[ ${{ matrix.arch }} == 'arm64' ]]; then
             clang -arch arm64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto \
             -Wl,-undefined,dynamic_lookup
 
-          elif [[ ${{ matrix.os }} == 'macos-latest' && ${{ matrix.arch }} == 'x86-64' ]]; then
+          elif [[ ${{ matrix.arch }} == 'x86-64' ]]; then
             clang -arch x86_64 -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
             -I$HOMEBREW_PREFIX/include -L$HOMEBREW_PREFIX/lib -lmosquitto
+
+          fi
+
+      - name: Compile for ${{ matrix.arch }} on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          if [[ ${{ matrix.arch }} == 'arm64' ]]; then
+            aarch64-linux-gnu-gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
+            -I/usr/include -L/usr/lib -lmosquitto
+
+          elif [[ ${{ matrix.arch }} == 'x86-64' ]]; then
+            gcc -fPIC -shared -o builds/${{ matrix.arch }}.so mosquitto-js-auth.c \
+            -I/usr/include -L/usr/lib -lmosquitto
 
           fi
 
