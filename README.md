@@ -34,34 +34,3 @@ Mosquitto JS auth is a lightweight and straightforward plugin for the Mosquitto 
         process.exit(1); // Authentication failed
     }
     ```
-
-### Building the plugin
-	Compile the plugin using the following command:
-	```bash
-	gcc -fPIC -shared -o mosquitto-js-auth.so mosquitto-js-auth.c -I/usr/include/mosquitto
-	```
-	- **`-fPIC`**: Generates position-independent code, which is required for shared libraries.
-	- **`-shared`**: Creates a shared object (`.so`) file.
-	- **`-I/usr/include/mosquitto`**: Points to the directory where Mosquitto header files are located.
-
-	Or, if that doesn't work, use:
-	```bash
-	gcc -arch arm64 -fPIC -shared -o builds/arm64.so mosquitto-js-auth.c -I/opt/homebrew/Cellar/mosquitto/2.0.18/include -L/opt/homebrew/Cellar/mosquitto/2.0.18/lib -lmosquitto
-	```
-	- **`-fPIC`**: Generates position-independent code, which is required for shared libraries.
-	- **`-shared`**: Creates a shared object (`.so`) file.
-	- **`-I/opt/homebrew/include`**: Specifies the include directory for Mosquitto headers.
-	- **`-L/opt/homebrew/lib`**: Specifies the library directory where Mosquitto’s libraries are located.
-	- **`-lmosquitto`**: Links against the Mosquitto library to resolve necessary symbols.
-
-	If you are using an ARM-based Mac (e.g., M1 or M2 chip):
-	```bash
-	gcc -arch arm64 -fPIC -shared -o builds/arm64.so mosquitto-js-auth.c -I/opt/homebrew/include -L/opt/homebrew/lib -lmosquitto -undefined dynamic_lookup
-	```
-	- **`-arch arm64`**: Compiles the plugin for ARM64 architecture, suitable for Apple Silicon.
-	- **`-fPIC`**: Generates position-independent code, which is required for shared libraries.
-	- **`-shared`**: Creates a shared object (`.so`) file.
-	- **`-I/opt/homebrew/include`**: Specifies the include directory for Mosquitto headers.
-	- **`-L/opt/homebrew/lib`**: Specifies the library directory where Mosquitto’s libraries are located.
-	- **`-lmosquitto`**: Links against the Mosquitto library to resolve necessary symbols.
-	- **`-Wl,-undefined,dynamic_lookup`**: Instructs the linker to resolve symbols dynamically, which is useful when the symbols are resolved at runtime.
