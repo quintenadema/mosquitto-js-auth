@@ -37,3 +37,12 @@ int mosquitto_auth_plugin_cleanup(void *user_data, struct mosquitto_opt *options
     
     return MOSQ_ERR_SUCCESS; // Cleanup successful
 }
+
+
+int mosquitto_auth_security_init(void *user_data, struct mosquitto_opt *options, int option_count, bool reload) {
+	return MOSQ_ERR_SUCCESS;
+}
+
+int mosquitto_auth_security_cleanup(void *user_data, struct mosquitto_opt *options, int option_count, bool reload) {
+	return MOSQ_ERR_SUCCESS;
+}
