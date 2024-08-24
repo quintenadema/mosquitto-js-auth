@@ -1,9 +1,7 @@
 # Mosquitto JS auth
-
-Mosquitto JS auth is a lightweight and straightforward plugin for the Mosquitto MQTT broker, designed to pass user credentials (username and password) to a custom script for authentication. 
+Mosquitto JS auth is a lightweight plugin for the Mosquitto MQTT broker, written in C, designed to pass user credentials (username and password) to a custom JS script for user authentication. 
 
 ## Features
-
 - Simple integration
 - Minimal and lightweight
 - ACL check support
@@ -11,7 +9,7 @@ Mosquitto JS auth is a lightweight and straightforward plugin for the Mosquitto 
 ## Installation
 
 1. **Clone builds folder**
-In the **builds** folder, you will find all builds for every system. 
+In the `builds` folder, you will find all builds for every system. 
 
 2. **Configure plugin**
 Add the following to your `mosquitto.conf`, and make sure to replace `/path/to/` to a place where the plugin is located, and `arm64.so` with the right build for your system:
