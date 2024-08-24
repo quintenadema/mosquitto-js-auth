@@ -47,6 +47,6 @@ int mosquitto_auth_security_cleanup(void *user_data, struct mosquitto_opt *optio
 	return MOSQ_ERR_SUCCESS;
 }
 
-int mosquitto_auth_acl_check(void *user_data, int access, const struct mosquitto *client, const struct mosquitto_acl_msg *message) {
-	return MOSQ_ERR_SUCCESS;
+int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *client, const struct mosquitto_acl_msg *msg) {
+    return MOSQ_ERR_SUCCESS;
 }
