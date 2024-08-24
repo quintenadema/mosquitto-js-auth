@@ -22,6 +22,8 @@ jobs:
       - name: Set up Docker environment
         run: |
           docker run --rm --platform linux/arm64 -v $(pwd):/workspace -w /workspace arm64v8/ubuntu:20.04 /bin/bash -c "
+          apt-get update && apt-get install -y software-properties-common && \
+          add-apt-repository ppa:mosquitto-dev/mosquitto-ppa && \
           apt-get update && apt-get install -y build-essential libmosquitto-dev mosquitto-dev && \
           gcc -fPIC -shared -o builds/arm64.so mosquitto-js-auth.c -I/usr/include -L/usr/lib -lmosquitto
           "
